@@ -1,0 +1,10 @@
+{
+<<<<<<< HEAD
+    "0": "driving",
+    "1": "falling_asleep",
+=======
+    "0": "assault",
+    "1": "driving",
+>>>>>>> origin/main
+    "2": "using_cellphone"
+}

@@ -1,0 +1,67 @@
+1818692 images for training, 202077 images for validation.
+
+
+65338 - only this number of files were preprocessed
+
+
+[epoch 1] train_loss: 1.772  val_accuracy: 0.082
+[epoch 2] train_loss: 1.333  val_accuracy: 0.084
+56791it [1:46:05,  8.92it/s]                                        | 2/30 [3:56:24<55:13:19, 7100.00s/it]
+[epoch 3] train_loss: 1.264  val_accuracy: 0.085
+56791it [1:44:58,  9.02it/s]                                        | 3/30 [5:54:00<53:05:55, 7079.84s/it]
+[epoch 4] train_loss: 1.241  val_accuracy: 0.085
+56791it [1:43:54,  9.11it/s]                                        | 4/30 [7:50:09<50:48:54, 7035.96s/it]
+[epoch 5] train_loss: 1.240  val_accuracy: 0.086
+56791it [1:41:33,  9.32it/s]                                        | 5/30 [9:45:14<48:32:01, 6988.88s/it]
+[epoch 6] train_loss: 1.266  val_accuracy: 0.086
+56791it [1:41:06,  9.36it/s]                                       | 6/30 [11:37:46<46:03:14, 6908.12s/it]
+[epoch 7] train_loss: 1.256  val_accuracy: 0.068
+56791it [1:41:26,  9.33it/s]                                       | 7/30 [13:29:38<43:43:37, 6844.22s/it]
+[epoch 8] train_loss: 1.298  val_accuracy: 0.085
+56791it [1:40:35,  9.41it/s]                                       | 8/30 [15:21:54<41:36:54, 6809.73s/it]
+[epoch 9] train_loss: 1.308  val_accuracy: 0.086
+56791it [1:45:18,  8.99it/s]                                       | 9/30 [17:13:16<39:29:24, 6769.72s/it]
+[epoch 10] train_loss: 1.349  val_accuracy: 0.083
+56791it [1:46:40,  8.87it/s]                                      | 10/30 [19:07:55<37:47:47, 6803.37s/it]
+[epoch 11] train_loss: 1.346  val_accuracy: 0.085
+56791it [1:46:29,  8.89it/s]                                      | 11/30 [21:03:58<36:09:54, 6852.35s/it]
+[epoch 12] train_loss: 1.400  val_accuracy: 0.085
+<<<<<<< HEAD
+13099it [23:45,  9.19it/s]                                        | 12/30 [23:01:18<34:32:49, 6909.42s/it]
+
+
+
+
+[epoch 1] train_loss: 1.098  val_accuracy: 0.104
+[epoch 2] train_loss: 0.420  val_accuracy: 0.106
+[epoch 3] train_loss: 0.285  val_accuracy: 0.107
+[epoch 4] train_loss: 0.231  val_accuracy: 0.107
+[epoch 5] train_loss: 0.196  val_accuracy: 0.109
+[epoch 6] train_loss: 0.189  val_accuracy: 0.109
+[epoch 7] train_loss: 0.169  val_accuracy: 0.108
+[epoch 8] train_loss: 0.164  val_accuracy: 0.109
+[epoch 9] train_loss: 0.153  val_accuracy: 0.110
+[epoch 10] train_loss: 0.145  val_accuracy: 0.109
+[epoch 11] train_loss: 0.126  val_accuracy: 0.108
+[epoch 12] train_loss: 0.144  val_accuracy: 0.110
+[epoch 13] train_loss: 0.126  val_accuracy: 0.109
+[epoch 14] train_loss: 0.120  val_accuracy: 0.108
+[epoch 15] train_loss: 0.116  val_accuracy: 0.110
+[epoch 16] train_loss: 0.119  val_accuracy: 0.110
+[epoch 17] train_loss: 0.121  val_accuracy: 0.109
+[epoch 18] train_loss: 0.093  val_accuracy: 0.110
+[epoch 19] train_loss: 0.111  val_accuracy: 0.110
+[epoch 20] train_loss: 0.102  val_accuracy: 0.111
+[epoch 21] train_loss: 0.096  val_accuracy: 0.108
+[epoch 22] train_loss: 0.127  val_accuracy: 0.110
+[epoch 23] train_loss: 0.076  val_accuracy: 0.111
+[epoch 24] train_loss: 0.084  val_accuracy: 0.110
+[epoch 25] train_loss: 0.089  val_accuracy: 0.108
+[epoch 26] train_loss: 0.075  val_accuracy: 0.111
+[epoch 27] train_loss: 0.084  val_accuracy: 0.110
+[epoch 28] train_loss: 0.078  val_accuracy: 0.110
+[epoch 29] train_loss: 0.087  val_accuracy: 0.109
+[epoch 30] train_loss: 0.109  val_accuracy: 0.111
+=======
+13099it [23:45,  9.19it/s]                                        | 12/30 [23:01:18<34:32:49, 6909.42s/it]
+>>>>>>> origin/main

@@ -1,0 +1,43 @@
+{
+<<<<<<< HEAD
+    "0": "assault",
+    "1": "driving",
+    "2": "using_cellphone"
+=======
+    "0": "being reached by foot",
+    "1": "being reached by hand",
+    "2": "bendding over",
+    "3": "blinking",
+    "4": "cellphone at the ear",
+    "5": "clapping",
+    "6": "drinking",
+    "7": "driving",
+    "8": "extending the hand",
+    "9": "falling asleep",
+    "10": "glancing",
+    "11": "hands off the wheel",
+    "12": "holding a cellphone",
+    "13": "holding something",
+    "14": "immobile",
+    "15": "leaning sideways",
+    "16": "looking at something",
+    "17": "looking at the center",
+    "18": "massaging an arm",
+    "19": "opening a window",
+    "20": "opening the door",
+    "21": "padding the shoulder",
+    "22": "reaching the middle compartment",
+    "23": "rubbing the eyes",
+    "24": "shaking head",
+    "25": "shaking something",
+    "26": "slapping",
+    "27": "spitting",
+    "28": "standing up",
+    "29": "steering the wheel",
+    "30": "tapping the thigh",
+    "31": "touching the neck",
+    "32": "turning around",
+    "33": "turning the head",
+    "34": "yawning"
+>>>>>>> origin/main
+}
