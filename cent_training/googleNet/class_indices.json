@@ -1,10 +1,7 @@
 {
-<<<<<<< HEAD
-    "0": "driving",
-    "1": "falling_asleep",
-=======
-    "0": "assault",
+    "0": "drinking",
     "1": "driving",
->>>>>>> origin/main
-    "2": "using_cellphone"
+    "2": "falling_asleep",
+    "3": "turning_around",
+    "4": "using_cellphone"
 }

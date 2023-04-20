@@ -56,7 +56,7 @@ def main():
     # test_data_iter = iter(validate_loader)
     # test_image, test_label = test_data_iter.next()
 
-    net = GoogLeNet(num_classes=3, aux_logits=True, init_weights=True)
+    net = GoogLeNet(num_classes=5, aux_logits=True, init_weights=True)
     net.to(device)
     loss_function = nn.CrossEntropyLoss(ignore_index=-1)
     optimizer = optim.Adam(net.parameters(), lr=0.0003)
