@@ -58,14 +58,10 @@ def main():
 
     net = GoogLeNet(num_classes=3, aux_logits=True, init_weights=True)
     net.to(device)
-    loss_function = nn.CrossEntropyLoss()
+    loss_function = nn.CrossEntropyLoss(ignore_index=-1)
     optimizer = optim.Adam(net.parameters(), lr=0.0003)
 
-<<<<<<< HEAD
     epochs = 30
-=======
-    epochs = 100
->>>>>>> origin/main
     best_acc = 0.0
     save_path = './googleNet_batch_8.pth'
     train_steps = len(train_loader)
