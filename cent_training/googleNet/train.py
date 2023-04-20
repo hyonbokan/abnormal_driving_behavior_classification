@@ -66,6 +66,7 @@ def main():
     save_path = './googleNet_batch_8.pth'
     train_steps = len(train_loader)
     train_losses = []
+    val_losses = []
     val_accuracies = []
     for epoch in tqdm(range(epochs)):
         # train
@@ -73,7 +74,7 @@ def main():
         running_loss = 0.0
         # let's tru to skip the line below
         # train_bar = tqdm(train_loader, file=sys.stdout) 
-        for step, data in enumerate(train_loader):
+        for step, data in tqdm(enumerate(train_loader)):
             images, labels = data
             optimizer.zero_grad()
             logits, aux_logits2, aux_logits1 = net(images.to(device))
