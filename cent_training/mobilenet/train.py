@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import transforms, datasets
+import urllib
 from tqdm import tqdm
 
 from model_v2 import MobileNetV2
@@ -54,8 +55,17 @@ def main():
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
 
-    # create model
-    net = torch.hub.load('pytorch/vision', 'mobilenet_v2', pretrained=True)
+
+    # download pre-trained weights
+    url = "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth"
+    model_weight_path = "./mobilenet_v2.pth"
+    urllib.request.urlretrieve(url, model_weight_path)
+
+    # load weights into model
+    net = MobileNetV2(num_classes=5)
+    pre_weights = torch.load(model_weight_path, map_location='cpu')
+    pre_dict = {k: v for k, v in pre_weights.items() if net.state_dict()[k].numel() == v.numel()}
+    missing_keys, unexpected_keys = net.load_state_dict(pre_dict, strict=False)
 
     # Modify the classifier to have 5 outputs instead of 1000
     num_ftrs = net.classifier[1].in_features
@@ -111,31 +121,32 @@ def main():
         train_accuracies.append(train_acc)
 
         # validate
+        # Validate
         net.eval()
-        acc = 0.0  # accumulate accurate number / epoch
         val_loss = 0.0
+        val_corrects = 0.0
         with torch.no_grad():
             val_bar = tqdm(validate_loader, file=sys.stdout)
             for val_data in val_bar:
                 val_images, val_labels = val_data
                 outputs = net(val_images.to(device))
-                # loss = loss_function(outputs, test_labels)
-                predict_y = torch.max(outputs, dim=1)[1]
-                acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
-                val_loss += loss_function(outputs, val_labels.to(device)).item()
+                loss = loss_function(outputs, val_labels.to(device))
+                val_loss += loss.item()
+                _, preds = torch.max(outputs, 1)
+                val_corrects += torch.sum(preds == val_labels.to(device))
 
-                val_bar.desc = "valid epoch[{}/{}]".format(epoch + 1,
-                                                           epochs)
-        val_accurate = acc / val_num
+        # Calculate validation accuracy
+        val_acc = val_corrects.double() / len(validate_loader.dataset)
         val_loss /= len(validate_loader)
         val_losses.append(val_loss)
-        val_accuracies.append(val_accurate)
+        val_accuracies.append(val_acc)
 
-        print('[epoch %d] train_loss: %.3f  val_loss: %.3f val_accuracy: %.3f' %
-            (epoch + 1, running_loss / train_steps, val_loss, val_accurate))
+        print('[Epoch %d/%d] Train Loss: %.3f, Train Acc: %.3f, Val Loss: %.3f, Val Acc: %.3f' %
+            (epoch + 1, epochs, train_losses[-1], train_accuracies[-1], val_losses[-1], val_accuracies[-1]))
 
-        if val_accurate > best_acc:
-            best_acc = val_accurate
+        # Save best model based on validation accuracy
+        if val_acc > best_acc:
+            best_acc = val_acc
             # torch.save(net.state_dict(), save_path)
 
     print('Finished Training')

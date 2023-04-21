@@ -114,6 +114,7 @@ def main():
         net.eval()
         acc = 0.0  # accumulate accurate number / epoch
         val_loss = 0.0
+        val_corrects = 0.0
         with torch.no_grad():
             val_bar = tqdm(validate_loader, file=sys.stdout)
             for val_data in val_bar:
@@ -123,9 +124,8 @@ def main():
                 predict_y = torch.max(outputs, dim=1)[1]
                 acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
                 val_loss += loss.item()
-
-                val_bar.desc = "valid epoch[{}/{}]".format(epoch + 1,
-                                                        epochs)
+                _, preds = torch.max(outputs, 1)
+                val_corrects += torch.sum(preds == val_labels.to(device))
 
         val_acc = acc / val_num
         val_loss /= len(validate_loader)
