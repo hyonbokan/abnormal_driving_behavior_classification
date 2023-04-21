@@ -53,6 +53,7 @@ def main():
 
 
     model_name = "vgg16"
+    save_path = './vgg16.pth'
     net = vgg(model_name=model_name, num_classes=5, init_weights=True)
     net.to(device)
     loss_function = nn.CrossEntropyLoss()
@@ -118,7 +119,7 @@ def main():
         # Save best model based on validation accuracy
         if val_acc > best_acc:
             best_acc = val_acc
-            # torch.save(net.state_dict(), save_path)
+            torch.save(net.state_dict(), save_path)
 
 
     print('Finished Training')
@@ -126,5 +127,6 @@ def main():
     print(f"Train_acc: {train_accuracies}")
     print(f"Val loss: {val_losses}")
     print(f"Val_acc: {val_accuracies}")
+
 if __name__ == '__main__':
     main()

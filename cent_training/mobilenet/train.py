@@ -147,7 +147,7 @@ def main():
         # Save best model based on validation accuracy
         if val_acc > best_acc:
             best_acc = val_acc
-            # torch.save(net.state_dict(), save_path)
+            torch.save(net.state_dict(), save_path)
 
     print('Finished Training')
     print(f"Train loss: {train_losses}")

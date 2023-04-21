@@ -75,7 +75,7 @@ def main():
 
     epochs = 20
     best_acc = 0.0
-    # save_path = './resNet34.pth'
+    save_path = './resNet34.pth'
     train_steps = len(train_loader)
     train_losses = []
     train_accuracies = []
@@ -137,7 +137,7 @@ def main():
 
         if val_acc > best_acc:
             best_acc = val_acc
-            # torch.save(net.state_dict(), save_path)
+            torch.save(net.state_dict(), save_path)
 
     print('Finished Training')
     print(f"Train loss: {train_losses}")
