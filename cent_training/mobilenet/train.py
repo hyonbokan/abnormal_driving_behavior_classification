@@ -59,13 +59,13 @@ def main():
 
     # load pretrain weights
     # download url: https://download.pytorch.org/models/mobilenet_v2-b0353104.pth
-    model_weight_path = "./mobilenet_v2.pth"
-    assert os.path.exists(model_weight_path), "file {} dose not exist.".format(model_weight_path)
-    pre_weights = torch.load(model_weight_path, map_location='cpu')
+    # model_weight_path = "./mobilenet_v2.pth"
+    # assert os.path.exists(model_weight_path), "file {} dose not exist.".format(model_weight_path)
+    # pre_weights = torch.load(model_weight_path, map_location='cpu')
 
-    # delete classifier weights
-    pre_dict = {k: v for k, v in pre_weights.items() if net.state_dict()[k].numel() == v.numel()}
-    missing_keys, unexpected_keys = net.load_state_dict(pre_dict, strict=False)
+    # # delete classifier weights
+    # pre_dict = {k: v for k, v in pre_weights.items() if net.state_dict()[k].numel() == v.numel()}
+    # missing_keys, unexpected_keys = net.load_state_dict(pre_dict, strict=False)
 
     # freeze features weights
     for param in net.features.parameters():

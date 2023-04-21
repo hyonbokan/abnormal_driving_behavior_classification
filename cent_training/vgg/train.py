@@ -63,12 +63,14 @@ def main():
     # save_path = './{}Net.pth'.format(model_name)
     train_steps = len(train_loader)
     train_losses = []
+    train_accuracies = []
     val_losses = []
     val_accuracies = []
     for epoch in range(epochs):
         # train
         net.train()
         running_loss = 0.0
+        running_corrects = 0.0
         train_bar = tqdm(train_loader, file=sys.stdout)
         for step, data in enumerate(train_bar):
             images, labels = data
@@ -84,6 +86,10 @@ def main():
             train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1,
                                                                      epochs,
                                                                      loss)
+        # calculate train accuracy
+        train_acc = running_corrects.double() / len(train_loader.dataset)
+        train_losses.append(running_loss / train_steps)
+        train_accuracies.append(train_acc)
 
         # validate
         net.eval()
@@ -98,15 +104,15 @@ def main():
                 acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
                 val_loss += loss_function(outputs, val_labels.to(device)).item()
 
-        val_accurate = acc / val_num
-        val_loss /= len(validate_loader)
-        # Save the metrics
-        train_losses.append(running_loss / train_steps)
-        val_losses.append(val_loss)
-        val_accuracies.append(val_accurate)
         
         print('[epoch %d] train_loss: %.3f  val_loss: %.3f val_accuracy: %.3f' %
               (epoch + 1, running_loss / train_steps, val_loss, val_accurate))
+        
+        val_accurate = acc / val_num
+        val_loss /= len(validate_loader)
+        val_losses.append(val_loss)
+        val_accuracies.append(val_accurate)
+
 
         if val_accurate > best_acc:
             best_acc = val_accurate

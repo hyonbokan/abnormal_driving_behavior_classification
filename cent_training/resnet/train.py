@@ -54,16 +54,16 @@ def main():
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
     
-    net = ResNet(block=BasicBlock, num_classes=3, blocks_num=[2,2,2,2]).to(device)
-    model_weight_path = "./resnet34-pre.pth"
-    assert os.path.exists(model_weight_path), "file {} does not exist.".format(model_weight_path)
-    net.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
+    net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(device)
+    # model_weight_path = "./resnet34-pre.pth"
+    # assert os.path.exists(model_weight_path), "file {} does not exist.".format(model_weight_path)
+    # net.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
     # for param in net.parameters():
     #     param.requires_grad = False
 
     # change fc layer structure
     in_channel = net.fc.in_features
-    net.fc = nn.Linear(in_channel, 3) # it could be the number of classes
+    net.fc = nn.Linear(in_channel, 5) # it could be the number of classes
     net.to(device)
 
     # define loss function
@@ -81,7 +81,6 @@ def main():
     train_accuracies = []
     val_losses = []
     val_accuracies = []
-    best_acc = 0.0
 
     for epoch in range(epochs):
         # train
