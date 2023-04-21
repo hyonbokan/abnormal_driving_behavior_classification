@@ -8,7 +8,7 @@ import torch.optim as optim
 from torchvision import transforms, datasets
 from tqdm import tqdm
 
-from model import ResNet, BasicBlock
+from model_v2 import MobileNetV2
 
 
 def main():
@@ -53,17 +53,24 @@ def main():
 
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
-    
-    net = ResNet(block=BasicBlock, num_classes=3, blocks_num=[2,2,2,2]).to(device)
-    model_weight_path = "./resnet34-pre.pth"
-    assert os.path.exists(model_weight_path), "file {} does not exist.".format(model_weight_path)
-    net.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
-    # for param in net.parameters():
-    #     param.requires_grad = False
 
-    # change fc layer structure
-    in_channel = net.fc.in_features
-    net.fc = nn.Linear(in_channel, 3) # it could be the number of classes
+    # create model
+    net = MobileNetV2(num_classes=5)
+
+    # load pretrain weights
+    # download url: https://download.pytorch.org/models/mobilenet_v2-b0353104.pth
+    model_weight_path = "./mobilenet_v2.pth"
+    assert os.path.exists(model_weight_path), "file {} dose not exist.".format(model_weight_path)
+    pre_weights = torch.load(model_weight_path, map_location='cpu')
+
+    # delete classifier weights
+    pre_dict = {k: v for k, v in pre_weights.items() if net.state_dict()[k].numel() == v.numel()}
+    missing_keys, unexpected_keys = net.load_state_dict(pre_dict, strict=False)
+
+    # freeze features weights
+    for param in net.features.parameters():
+        param.requires_grad = False
+
     net.to(device)
 
     # define loss function
@@ -73,15 +80,14 @@ def main():
     params = [p for p in net.parameters() if p.requires_grad]
     optimizer = optim.Adam(params, lr=0.0001)
 
-    epochs = 10
+    epochs = 20
     best_acc = 0.0
-    # save_path = './resNet34.pth'
+    save_path = './MobileNetV2.pth'
     train_steps = len(train_loader)
     train_losses = []
     train_accuracies = []
     val_losses = []
     val_accuracies = []
-    best_acc = 0.0
 
     for epoch in range(epochs):
         # train
@@ -105,7 +111,6 @@ def main():
             train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1,
                                                                     epochs,
                                                                     loss)
-
         # calculate train accuracy
         train_acc = running_corrects.double() / len(train_loader.dataset)
         train_losses.append(running_loss / train_steps)
@@ -120,29 +125,27 @@ def main():
             for val_data in val_bar:
                 val_images, val_labels = val_data
                 outputs = net(val_images.to(device))
-                loss = loss_function(outputs, val_labels.to(device))
+                # loss = loss_function(outputs, test_labels)
                 predict_y = torch.max(outputs, dim=1)[1]
                 acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
-                val_loss += loss.item()
+                val_loss += loss_function(outputs, val_labels.to(device)).item()
 
                 val_bar.desc = "valid epoch[{}/{}]".format(epoch + 1,
-                                                        epochs)
-
-        val_acc = acc / val_num
+                                                           epochs)
+        val_accurate = acc / val_num
         val_loss /= len(validate_loader)
         val_losses.append(val_loss)
-        val_accuracies.append(val_acc)
+        val_accuracies.append(val_accurate)
 
-        print('[epoch %d] train_loss: %.3f train_acc: %.3f val_loss: %.3f val_accuracy: %.3f' %
-            (epoch + 1, train_losses[-1], train_accuracies[-1], val_loss, val_acc))
+        print('[epoch %d] train_loss: %.3f  val_loss: %.3f val_accuracy: %.3f' %
+            (epoch + 1, running_loss / train_steps, val_loss, val_accurate))
 
-        if val_acc > best_acc:
-            best_acc = val_acc
+        if val_accurate > best_acc:
+            best_acc = val_accurate
             # torch.save(net.state_dict(), save_path)
 
     print('Finished Training')
     print(f"Train loss: {train_losses}")
-    print(f"Train_acc: {train_accuracies}")
     print(f"Val loss: {val_losses}")
     print(f"Val_acc: {val_accuracies} ")
 
