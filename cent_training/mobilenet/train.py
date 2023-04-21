@@ -55,17 +55,11 @@ def main():
                                                                            val_num))
 
     # create model
-    net = MobileNetV2(num_classes=5)
+    net = torch.hub.load('pytorch/vision', 'mobilenet_v2', pretrained=True)
 
-    # load pretrain weights
-    # download url: https://download.pytorch.org/models/mobilenet_v2-b0353104.pth
-    # model_weight_path = "./mobilenet_v2.pth"
-    # assert os.path.exists(model_weight_path), "file {} dose not exist.".format(model_weight_path)
-    # pre_weights = torch.load(model_weight_path, map_location='cpu')
-
-    # # delete classifier weights
-    # pre_dict = {k: v for k, v in pre_weights.items() if net.state_dict()[k].numel() == v.numel()}
-    # missing_keys, unexpected_keys = net.load_state_dict(pre_dict, strict=False)
+    # Modify the classifier to have 5 outputs instead of 1000
+    num_ftrs = net.classifier[1].in_features
+    net.classifier[1] = torch.nn.Linear(num_ftrs, 5)
 
     # freeze features weights
     for param in net.features.parameters():
@@ -146,6 +140,7 @@ def main():
 
     print('Finished Training')
     print(f"Train loss: {train_losses}")
+    print(f"Train_acc: {train_accuracies}")
     print(f"Val loss: {val_losses}")
     print(f"Val_acc: {val_accuracies} ")
 

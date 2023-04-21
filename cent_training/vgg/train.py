@@ -60,14 +60,14 @@ def main():
 
     epochs = 20
     best_acc = 0.0
-    # save_path = './{}Net.pth'.format(model_name)
     train_steps = len(train_loader)
     train_losses = []
     train_accuracies = []
     val_losses = []
     val_accuracies = []
+
     for epoch in range(epochs):
-        # train
+        # Train
         net.train()
         running_loss = 0.0
         running_corrects = 0.0
@@ -80,48 +80,51 @@ def main():
             loss.backward()
             optimizer.step()
 
-            # print statistics
+            # Print statistics
             running_loss += loss.item()
+            _, preds = torch.max(outputs, 1)
+            running_corrects += torch.sum(preds == labels.to(device))
 
-            train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1,
-                                                                     epochs,
-                                                                     loss)
-        # calculate train accuracy
+            train_bar.desc = "Train Epoch [{}/{}] Loss: {:.3f}".format(epoch + 1, epochs, loss)
+
+        # Calculate train accuracy
         train_acc = running_corrects.double() / len(train_loader.dataset)
         train_losses.append(running_loss / train_steps)
         train_accuracies.append(train_acc)
 
-        # validate
+        # Validate
         net.eval()
-        acc = 0.0  # accumulate accurate number / epoch
         val_loss = 0.0
+        val_corrects = 0.0
         with torch.no_grad():
             val_bar = tqdm(validate_loader, file=sys.stdout)
             for val_data in val_bar:
                 val_images, val_labels = val_data
                 outputs = net(val_images.to(device))
-                predict_y = torch.max(outputs, dim=1)[1]
-                acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
-                val_loss += loss_function(outputs, val_labels.to(device)).item()
+                loss = loss_function(outputs, val_labels.to(device))
+                val_loss += loss.item()
+                _, preds = torch.max(outputs, 1)
+                val_corrects += torch.sum(preds == val_labels.to(device))
 
-        
-        print('[epoch %d] train_loss: %.3f  val_loss: %.3f val_accuracy: %.3f' %
-              (epoch + 1, running_loss / train_steps, val_loss, val_accurate))
-        
-        val_accurate = acc / val_num
+        # Calculate validation accuracy
+        val_acc = val_corrects.double() / len(validate_loader.dataset)
         val_loss /= len(validate_loader)
         val_losses.append(val_loss)
-        val_accuracies.append(val_accurate)
+        val_accuracies.append(val_acc)
 
+        print('[Epoch %d/%d] Train Loss: %.3f, Train Acc: %.3f, Val Loss: %.3f, Val Acc: %.3f' %
+            (epoch + 1, epochs, train_losses[-1], train_accuracies[-1], val_losses[-1], val_accuracies[-1]))
 
-        if val_accurate > best_acc:
-            best_acc = val_accurate
+        # Save best model based on validation accuracy
+        if val_acc > best_acc:
+            best_acc = val_acc
             # torch.save(net.state_dict(), save_path)
+
 
     print('Finished Training')
     print(f"Train loss: {train_losses}")
+    print(f"Train_acc: {train_accuracies}")
     print(f"Val loss: {val_losses}")
-    print(f"Val_acc: {val_accuracies} ")
-
+    print(f"Val_acc: {val_accuracies}")
 if __name__ == '__main__':
     main()
