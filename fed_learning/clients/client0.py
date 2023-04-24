@@ -7,13 +7,15 @@ import torch.nn.functional as F
 
 import flwr as fl
 from flwr.common import Metrics
-from model import GoogLeNet
+from model import ResNet, BasicBlock
 from split_data import trainloaders, valloaders
 
 DEVICE = torch.device("cuda")  # Try "cuda" to train on GPU
 print(
     f"Training on {DEVICE} using PyTorch {torch.__version__} and Flower {fl.__version__}"
 )
+
+
 
 
 def train(net, trainloader, epochs: int, verbose=False):
@@ -97,7 +99,10 @@ class FlowerClient(fl.client.NumPyClient):
 
 def client_fn(cid: str) -> FlowerClient:
     """Create a Flower client representing a single organization."""
-    net = GoogLeNet(num_classes=35, aux_logits=True, init_weights=True).to(DEVICE)
+    net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2])
+    in_channel = net.fc.in_features
+    net.fc = nn.Linear(in_channel, 5)
+    net.to(DEVICE)
     # Note: each client gets a different trainloader/valloader, so each client
     # will train and evaluate on their own unique data
     trainloader = trainloaders[int(cid)]
