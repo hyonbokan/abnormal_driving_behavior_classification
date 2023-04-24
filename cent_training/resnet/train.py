@@ -28,7 +28,6 @@ def main():
                                          transform=data_transform["train"])
     train_num = len(train_dataset)
 
-    # {'daisy':0, 'dandelion':1, 'roses':2, 'sunflower':3, 'tulips':4}
     list = train_dataset.class_to_idx
     cla_dict = dict((val, key) for key, val in list.items())
     # write dict into json file
