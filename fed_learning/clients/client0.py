@@ -63,7 +63,7 @@ def test(net, testloader):
             predicted = torch.max(outputs.data, dim=1)[1]
             total += labels.size(0)
             correct += torch.eq(predicted, labels).sum().item()
-    loss /= len(testloader.dataset)
+    loss /= len(testloader)
     accuracy = correct / total
     return loss, accuracy
 
