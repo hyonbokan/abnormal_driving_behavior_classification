@@ -4,12 +4,12 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import os
+
 import flwr as fl
 from flwr.common import Metrics
-
 from resnet import ResNet, BasicBlock, resnet34
-from split_data import trainloaders, valloaders
+from split_data import train_loader, val_loader
+from tqdm import tqdm
 
 DEVICE = torch.device("cuda")  # Try "cuda" to train on GPU
 print(
@@ -26,96 +26,58 @@ def train(net, trainloader, epochs: int, verbose=False):
     net.train()
     for epoch in range(epochs):
         # train
-        net.train()
-        running_loss = 0.0
-        # let's tru to skip the line below
-        # train_bar = tqdm(train_loader, file=sys.stdout) 
-        for step, data in enumerate(trainloader):
-            images, labels = data
-            optimizer.zero_grad()
-            logits, aux_logits2, aux_logits1 = net(images.to(DEVICE))
-            loss0 = criterion(logits, labels.to(DEVICE))
-            loss1 = criterion(aux_logits1, labels.to(DEVICE))
-            loss2 = criterion(aux_logits2, labels.to(DEVICE))
-            loss = loss0 + loss1 * 0.3 + loss2 * 0.3
-            loss.backward()
-            optimizer.step()
-
-            # print statistics
-            running_loss += loss.item()
-            
-            # trainloader.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1,
-            #                                                          epochs,
-            #                                                          loss)
-        if verbose:
-            print(f"Epoch {epoch + 1} - Training loss: {running_loss / len(trainloader)}")
+        for images, labels in tqdm(trainloader):
+                    optimizer.zero_grad()
+                    criterion(net(images.to(DEVICE)), labels.to(DEVICE)).backward()
+                    optimizer.step()
 
 
 def test(net, testloader):
-    """Evaluate the network on the entire test set."""
+    """Validate the model on the test set."""
     criterion = torch.nn.CrossEntropyLoss()
-    correct, total, loss = 0, 0, 0.0
-    net.eval()
+    correct, loss = 0, 0.0
     with torch.no_grad():
-        for images, labels in testloader:
-            images, labels = images.to(DEVICE), labels.to(DEVICE)
-            outputs = net(images)
+        for images, labels in tqdm(testloader):
+            outputs = net(images.to(DEVICE))
+            labels = labels.to(DEVICE)
             loss += criterion(outputs, labels).item()
-            predicted = torch.max(outputs.data, dim=1)[1]
-            total += labels.size(0)
-            correct += torch.eq(predicted, labels).sum().item()
-    loss /= len(testloader)
-    accuracy = correct / total
+            correct += (torch.max(outputs.data, 1)[1] == labels).sum().item()
+    accuracy = correct / len(testloader.dataset)
     return loss, accuracy
 
 
-def get_parameters(net) -> List[np.ndarray]:
-    return [val.cpu().numpy() for _, val in net.state_dict().items()]
+net = resnet34(num_classes=5).to(DEVICE)
+# net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(DEVICE)
+# in_channel = net.fc.in_features
+# net.fc = nn.Linear(in_channel, 5)
+trainloader = train_loader
+testloader = val_loader
 
-
-def set_parameters(net, parameters: List[np.ndarray]):
-    params_dict = zip(net.state_dict().keys(), parameters)
-    state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
-    # print(state_dict.keys())
-    net.load_state_dict(state_dict)
-
-
-
+# Define Flower client
 class FlowerClient(fl.client.NumPyClient):
-    def __init__(self, net, trainloader, valloader):
-        self.net = net
-        self.trainloader = trainloader
-        self.valloader = valloader
-
     def get_parameters(self, config):
-        return get_parameters(self.net)
+        return [val.cpu().numpy() for _, val in net.state_dict().items()]
+
+    def set_parameters(self, parameters):
+        params_dict = zip(net.state_dict().keys(), parameters)
+        state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
+        net.load_state_dict(state_dict, strict=True)
 
     def fit(self, parameters, config):
-        set_parameters(self.net, parameters)
-        train(self.net, self.trainloader, epochs=1)
-        return get_parameters(self.net), len(self.trainloader), {}
+        self.set_parameters(parameters)
+        train(net, trainloader, epochs=1)
+        # Can I have it show the train acc and loss in the {}?
+        return self.get_parameters(config={}), len(trainloader.dataset), {}
 
     def evaluate(self, parameters, config):
-        set_parameters(self.net, parameters)
-        loss, accuracy = test(self.net, self.valloader)
-        return float(loss), len(self.valloader), {"accuracy": float(accuracy)}
+        self.set_parameters(parameters)
+        loss, accuracy = test(net, testloader)
+        # Can make it show the loss here?
+        return loss, len(testloader.dataset), {"accuracy": accuracy}
 
-def client_fn(cid: str) -> FlowerClient:
-    """Create a Flower client representing a single organization."""
-    # net = resnet34(num_classes=5)
-    net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2])
-    in_channel = net.fc.in_features
-    net.fc = nn.Linear(in_channel, 5)
-    # Note: each client gets a different trainloader/valloader, so each client
-    # will train and evaluate on their own unique data
-    trainloader = trainloaders[int(cid)]
-    valloader = valloaders[int(cid)]
-    print(f"Length of trainloader for client {cid}: {len(trainloader)}")
-    print(f"Length of valloader for client {cid}: {len(valloader)}")
-    return FlowerClient(net, trainloader, valloader)
 
 # Start Flower client
 fl.client.start_numpy_client(
     server_address="127.0.0.1:8080",
-    client=client_fn(0),
+    client=FlowerClient()
 )

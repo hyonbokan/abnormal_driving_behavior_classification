@@ -1,111 +1,63 @@
 import torch
-from torch.utils.data import DataLoader, random_split
-from torchvision import transforms, datasets
+from torchvision import datasets, transforms
+import os
 
 
-
-
+train_path = '/home/dnlab/Data-B/data/main_data/train_cat_new'
+val_path = '/home/dnlab/Data-B/data/main_data/val_cat_new'
 
 BATCH_SIZE = 32
 NUM_CLIENTS = 2
+nw = min([os.cpu_count(), BATCH_SIZE if BATCH_SIZE > 1 else 0, 8])
 
-def load_datasets():
-    transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-    trainset =  datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/val_cat_new",
-                                     transform=transform)
-    valset =  datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/val_cat_new",
-                                         transform=transform)
-    return trainset, valset
+def load_datasets(train_dir, val_dir):
+    data_transform = {
+        "train": transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+        "val": transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    }
 
-# ----------------------------
-def split_datasets(trainset, valset, num_clients):
-    # Calculate the number of samples per client
-    num_train_samples = len(trainset)
-    num_val_samples = len(valset)
-    train_samples_per_client = num_train_samples // num_clients
-    val_samples_per_client = num_val_samples // num_clients
-    
-    # Calculate the starting and ending indices for each client
-    train_indices = [i * train_samples_per_client for i in range(num_clients)]
-    train_indices.append(num_train_samples)
-    val_indices = [i * val_samples_per_client for i in range(num_clients)]
-    val_indices.append(num_val_samples)
-    
-    # Split the trainset and valset for each client
-    trainloaders = []
-    valloaders = []
+    train_dataset = datasets.ImageFolder(root=train_dir,
+                                         transform=data_transform["train"])
+    train_loader = torch.utils.data.DataLoader(train_dataset,
+                                               batch_size=BATCH_SIZE, shuffle=True,
+                                               num_workers=nw)
+
+    validate_dataset = datasets.ImageFolder(root=val_dir,
+                                            transform=data_transform["val"])
+    validate_loader = torch.utils.data.DataLoader(validate_dataset,
+                                                  batch_size=BATCH_SIZE, shuffle=False,
+                                                  num_workers=nw)
+    return train_loader, validate_loader
+
+
+def split_dataset(train_loader, validate_loader, num_clients):
+    train_datasets = []
+    validate_datasets = []
+    train_size = len(train_loader.dataset)
+    val_size = len(validate_loader.dataset)
+    train_indices = list(range(train_size))
+    val_indices = list(range(val_size))
+    num_train_samples_per_client = train_size // num_clients
+    num_val_samples_per_client = val_size // num_clients
     for i in range(num_clients):
-        trainloader = torch.utils.data.DataLoader(
-            trainset,
-            batch_size=BATCH_SIZE,
-            sampler=torch.utils.data.sampler.SubsetRandomSampler(
-                range(train_indices[i], train_indices[i+1])
-            ),
-            num_workers=2
-        )
-        trainloaders.append(trainloader)
-        
-        valloader = torch.utils.data.DataLoader(
-            valset,
-            batch_size=BATCH_SIZE,
-            sampler=torch.utils.data.sampler.SubsetRandomSampler(
-                range(val_indices[i], val_indices[i+1])
-            ),
-            num_workers=2
-        )
-        valloaders.append(valloader)
-        
-    return trainloaders, valloaders
-
-trainset, valset = load_datasets()
-trainloaders, valloaders = split_datasets(trainset, valset, NUM_CLIENTS)
+        train_sampler = torch.utils.data.sampler.SubsetRandomSampler(
+            train_indices[i*num_train_samples_per_client:(i+1)*num_train_samples_per_client])
+        validate_sampler = torch.utils.data.sampler.SubsetRandomSampler(
+            val_indices[i*num_val_samples_per_client:(i+1)*num_val_samples_per_client])
+        train_datasets.append(torch.utils.data.DataLoader(train_loader.dataset,
+            batch_size=train_loader.batch_size, sampler=train_sampler))
+        validate_datasets.append(torch.utils.data.DataLoader(validate_loader.dataset,
+            batch_size=validate_loader.batch_size, sampler=validate_sampler))
+    return train_datasets, validate_datasets
 
 
 
-print(len(trainloaders[0]))
-print(len(trainloaders[1]))
-# print(len(trainloaders[2]))
-# print(len(trainloaders[3]))
+train_loader, val_loader = load_datasets(train_path, val_path)
+train_sets, val_sets = split_dataset(train_loader, val_loader, NUM_CLIENTS)
 
-# num_train_samples = len(trainset)
-# num_val_samples = len(valset)
-# train_samples_per_client = num_train_samples // 4
-# val_samples_per_client = num_val_samples // 4
+print(len(train_sets[0]))
 
-# train_indices = [i * train_samples_per_client for i in range(4)]
-# train_indices.append(num_train_samples)
-# val_indices = [i * val_samples_per_client for i in range(4)]
-# val_indices.append(num_val_samples)
-
-# print(train_indices)
-# print(val_indices)
-
-
-# trainloaders = []
-# valloaders = []
-# for i in range(4):
-#     trainloader = torch.utils.data.DataLoader(
-#         trainset,
-#         batch_size=BATCH_SIZE, ## batch_size makes it 12k
-#         sampler=torch.utils.data.sampler.SubsetRandomSampler(
-#             range(train_indices[i], train_indices[i+1])
-#         ),
-#         num_workers=2
-#     )
-#     trainloaders.append(trainloader)
-#     print(len(trainloaders[i]))
-#     valloader = torch.utils.data.DataLoader(
-#         valset,
-#         batch_size=BATCH_SIZE,
-#         sampler=torch.utils.data.sampler.SubsetRandomSampler(
-#             range(val_indices[i], val_indices[i+1])
-#         ),
-#         num_workers=2
-#     )
-#     valloaders.append(valloader)
-
-# print(len(trainloaders[0]))
-# print(len(trainloaders[1]))
-# print(len(trainloaders[2]))
-# print(len(trainloaders[3]))
