@@ -8,7 +8,8 @@ import torch.nn.functional as F
 import flwr as fl
 from flwr.common import Metrics
 from resnet import ResNet, BasicBlock, resnet34
-from split_data import train_loader, val_loader, train_sets, val_sets
+# from split_data import train_sets, val_sets
+from dataloader import train_loader, val_loader
 from tqdm import tqdm
 
 DEVICE = torch.device("cuda")  # Try "cuda" to train on GPU
@@ -51,8 +52,8 @@ net = resnet34(num_classes=5).to(DEVICE)
 # net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(DEVICE)
 # in_channel = net.fc.in_features
 # net.fc = nn.Linear(in_channel, 5)
-trainloader = train_sets[0]
-testloader = val_sets[0]
+trainloader = train_loader[0]
+testloader = val_loader[0]
 
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):

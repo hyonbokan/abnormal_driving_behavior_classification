@@ -2,7 +2,7 @@ import torch
 from torchvision import datasets, transforms
 import os
 
-
+# Incorrect code
 train_path = '/home/dnlab/Data-B/data/main_data/train_cat_new'
 val_path = '/home/dnlab/Data-B/data/main_data/val_cat_new'
 
@@ -23,7 +23,7 @@ def load_datasets(train_dir, val_dir):
     train_dataset = datasets.ImageFolder(root=train_dir,
                                          transform=data_transform["train"])
     train_loader = torch.utils.data.DataLoader(train_dataset,
-                                               batch_size=BATCH_SIZE, shuffle=True,
+                                               batch_size=BATCH_SIZE, shuffle=False,
                                                num_workers=nw)
 
     validate_dataset = datasets.ImageFolder(root=val_dir,

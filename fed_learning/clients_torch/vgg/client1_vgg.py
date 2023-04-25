@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 import flwr as fl
 from flwr.common import Metrics
-from vgg import vgg
+from fed_learning.clients_torch.vgg.vgg import vgg
 from split_data import train_loader, val_loader, train_sets, val_sets
 from tqdm import tqdm
 
