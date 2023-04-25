@@ -8,7 +8,7 @@ import torch.optim as optim
 from torchvision import transforms, datasets
 from tqdm import tqdm
 
-from model import ResNet, BasicBlock
+from model import ResNet, BasicBlock, resnet34
 
 
 def main():
@@ -53,16 +53,11 @@ def main():
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
     
-    net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(device)
-    # model_weight_path = "./resnet34-pre.pth"
-    # assert os.path.exists(model_weight_path), "file {} does not exist.".format(model_weight_path)
-    # net.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
-    # for param in net.parameters():
-    #     param.requires_grad = False
-
+    # net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2])
+    net = resnet34(num_classes=5)
     # change fc layer structure
-    in_channel = net.fc.in_features
-    net.fc = nn.Linear(in_channel, 5) # it could be the number of classes
+    # in_channel = net.fc.in_features
+    # net.fc = nn.Linear(in_channel, 5) # it could be the number of classes
     net.to(device)
 
     # define loss function
@@ -107,7 +102,7 @@ def main():
         # calculate train accuracy
         train_acc = running_corrects.double() / len(train_loader.dataset)
         train_losses.append(running_loss / train_steps)
-        train_accuracies.append(train_acc)
+        train_accuracies.append(train_acc.item())
 
         # validate
         net.eval()
