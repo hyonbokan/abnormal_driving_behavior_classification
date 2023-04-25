@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import flwr as fl
 from flwr.common import Metrics
 from resnet import ResNet, BasicBlock, resnet34
-from split_data import train_loader, val_loader
+from split_data import train_loader, val_loader, train_sets, val_sets
 from tqdm import tqdm
 
 DEVICE = torch.device("cuda")  # Try "cuda" to train on GPU
@@ -35,6 +35,7 @@ def train(net, trainloader, epochs: int, verbose=False):
 def test(net, testloader):
     """Validate the model on the test set."""
     criterion = torch.nn.CrossEntropyLoss()
+    net.eval()
     correct, loss = 0, 0.0
     with torch.no_grad():
         for images, labels in tqdm(testloader):
@@ -50,8 +51,8 @@ net = resnet34(num_classes=5).to(DEVICE)
 # net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(DEVICE)
 # in_channel = net.fc.in_features
 # net.fc = nn.Linear(in_channel, 5)
-trainloader = train_loader
-testloader = val_loader
+trainloader = train_sets[0]
+testloader = val_sets[0]
 
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
