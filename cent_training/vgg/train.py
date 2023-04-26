@@ -89,7 +89,7 @@ def main():
             train_bar.desc = "Train Epoch [{}/{}] Loss: {:.3f}".format(epoch + 1, epochs, loss)
 
         # Calculate train accuracy
-        train_acc = running_corrects.double() / len(train_loader.dataset)
+        train_acc = running_corrects.double() / len(train_loader)
         train_losses.append(running_loss / train_steps)
         train_accuracies.append(train_acc)
 
@@ -108,7 +108,7 @@ def main():
                 val_corrects += torch.sum(preds == val_labels.to(device))
 
         # Calculate validation accuracy
-        val_acc = val_corrects.double() / len(validate_loader.dataset)
+        val_acc = val_corrects.double() / len(validate_loader)
         val_loss /= len(validate_loader)
         val_losses.append(val_loss)
         val_accuracies.append(val_acc)
