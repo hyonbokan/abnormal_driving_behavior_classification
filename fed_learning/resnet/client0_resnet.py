@@ -4,26 +4,47 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 import flwr as fl
 from flwr.common import Metrics
 from resnet import ResNet, BasicBlock, resnet34
-# from split_data import train_sets, val_sets
 from dataloader import train_loader, val_loader
 from tqdm import tqdm
+from opacus import PrivacyEngine
+from opacus.utils.batch_memory_manager import BatchMemoryManager
 
 DEVICE = torch.device("cuda")  # Try "cuda" to train on GPU
 print(
     f"Training on {DEVICE} using PyTorch {torch.__version__} and Flower {fl.__version__}"
 )
+EPOCHS = 1
+MAX_GRAD_NORM = 1.2
+EPSILON = 50.0
+DELTA = 1e-5
+
+net = resnet34(num_classes=5).to(DEVICE)
+trainloader = train_loader[0]
+testloader = val_loader[0]
 
 
+# privacy_engine = PrivacyEngine()
+# net, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
+#     module=net,
+#     optimizer=optimizer,
+#     data_loader=trainloader,
+#     epochs=EPOCHS,
+#     target_epsilon=EPSILON,
+#     target_delta=DELTA,
+#     max_grad_norm=MAX_GRAD_NORM,
+# )
+
+# print(f"Using sigma={optimizer.noise_multiplier} and C={MAX_GRAD_NORM}")
 
 
 def train(net, trainloader, epochs: int, verbose=False):
     """Train the network on the training set."""
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=0.0001)
+    # Add DP code here
     net.train()
     for epoch in range(epochs):
         # train
@@ -48,13 +69,6 @@ def test(net, testloader):
     return loss, accuracy
 
 
-net = resnet34(num_classes=5).to(DEVICE)
-# net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(DEVICE)
-# in_channel = net.fc.in_features
-# net.fc = nn.Linear(in_channel, 5)
-trainloader = train_loader[0]
-testloader = val_loader[0]
-
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
     def get_parameters(self, config):
@@ -67,7 +81,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         self.set_parameters(parameters)
-        train(net, trainloader, epochs=1)
+        train(net, trainloader, epochs=EPOCHS)
         # Can I have it show the train acc and loss in the {}?
         return self.get_parameters(config={}), len(trainloader.dataset), {}
 
