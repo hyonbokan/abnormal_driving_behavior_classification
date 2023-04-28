@@ -4,9 +4,9 @@ import shutil
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-input_dir = '/media/Data-B/data/main_data/train_cat_new/turning_around'
-train_dir = '/media/Data-B/data/main_data/train_cat_new/turning_around_train'
-val_dir = '/media/Data-B/data/main_data/val_cat_new/turning_around_val'
+input_dir = '/media/Data-B/data/main_data/train_cat_new/yawning_all'
+train_dir = '/media/Data-B/data/main_data/train_cat_new/yawning_all_train'
+val_dir = '/media/Data-B/data/main_data/val_cat_new/yawning_all'
 
 if not os.path.exists(train_dir):
     os.makedirs(train_dir)
