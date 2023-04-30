@@ -21,7 +21,7 @@ MAX_GRAD_NORM = 1.2
 EPSILON = 50.0
 DELTA = 1e-5
 
-net = resnet34(num_classes=5).to(DEVICE)
+net = resnet34(num_classes=7).to(DEVICE)
 trainloader = train_loader[0]
 testloader = val_loader[0]
 

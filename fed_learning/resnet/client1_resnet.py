@@ -47,10 +47,7 @@ def test(net, testloader):
     return loss, accuracy
 
 
-net = resnet34(num_classes=5).to(DEVICE)
-# net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(DEVICE)
-# in_channel = net.fc.in_features
-# net.fc = nn.Linear(in_channel, 5)
+net = resnet34(num_classes=7).to(DEVICE)
 trainloader = train_loader[1]
 testloader = val_loader[1]
 
