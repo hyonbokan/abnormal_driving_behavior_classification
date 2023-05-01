@@ -21,7 +21,7 @@ strategy = fl.server.strategy.FedAvg(
     min_fit_clients=2,  #  Sample 3 clients for training
     min_evaluate_clients=2,
     min_available_clients=2,
-    evaluate_metrics_aggregation_fn=weighted_average  
+    evaluate_metrics_aggregation_fn=weighted_average
 )
 
 # Start Flower server

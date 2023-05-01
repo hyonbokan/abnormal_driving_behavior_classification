@@ -2,6 +2,8 @@
     "0": "drinking",
     "1": "driving",
     "2": "falling_asleep",
-    "3": "turning_around",
-    "4": "using_cellphone"
+    "3": "rubbing_eyes",
+    "4": "turning_around",
+    "5": "using_cellphone",
+    "6": "yawning"
 }

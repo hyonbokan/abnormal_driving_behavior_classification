@@ -54,7 +54,7 @@ def main():
                                                                            val_num))
     
     # net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2])
-    net = resnet34(num_classes=5)
+    net = resnet34(num_classes=7)
     # change fc layer structure
     # in_channel = net.fc.in_features
     # net.fc = nn.Linear(in_channel, 5) # it could be the number of classes
@@ -131,7 +131,7 @@ def main():
 
         if val_acc > best_acc:
             best_acc = val_acc
-            torch.save(net.state_dict(), save_path)
+            # torch.save(net.state_dict(), save_path)
 
     print('Finished Training')
     print(f"Train loss: {train_losses}")
