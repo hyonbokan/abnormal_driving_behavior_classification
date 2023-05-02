@@ -16,28 +16,11 @@ DEVICE = torch.device("cuda")  # Try "cuda" to train on GPU
 print(
     f"Training on {DEVICE} using PyTorch {torch.__version__} and Flower {fl.__version__}"
 )
-EPOCHS = 1
-MAX_GRAD_NORM = 1.2
-EPSILON = 50.0
-DELTA = 1e-5
 
 net = resnet34(num_classes=7).to(DEVICE)
 trainloader = train_loader[0]
 testloader = val_loader[0]
 
-
-# privacy_engine = PrivacyEngine()
-# net, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
-#     module=net,
-#     optimizer=optimizer,
-#     data_loader=trainloader,
-#     epochs=EPOCHS,
-#     target_epsilon=EPSILON,
-#     target_delta=DELTA,
-#     max_grad_norm=MAX_GRAD_NORM,
-# )
-
-# print(f"Using sigma={optimizer.noise_multiplier} and C={MAX_GRAD_NORM}")
 
 
 def train(net, trainloader, epochs: int, verbose=False):
@@ -81,7 +64,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         self.set_parameters(parameters)
-        train(net, trainloader, epochs=EPOCHS)
+        train(net, trainloader, epochs=1)
         # Can I have it show the train acc and loss in the {}?
         return self.get_parameters(config={}), len(trainloader.dataset), {}
 
