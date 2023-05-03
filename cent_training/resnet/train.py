@@ -24,7 +24,7 @@ def main():
                                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
 
 
-    train_dataset = datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/train_cat_new",
+    train_dataset = datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/train_new",
                                          transform=data_transform["train"])
     train_num = len(train_dataset)
 
@@ -35,7 +35,7 @@ def main():
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
 
-    batch_size = 32
+    batch_size = 16
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
     print('Using {} dataloader workers every process'.format(nw))
 
@@ -43,7 +43,7 @@ def main():
                                                batch_size=batch_size, shuffle=True,
                                                num_workers=nw)
 
-    validate_dataset = datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/val_cat_new",
+    validate_dataset = datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/val_new",
                                             transform=data_transform["val"])
     val_num = len(validate_dataset)
     validate_loader = torch.utils.data.DataLoader(validate_dataset,
@@ -67,7 +67,7 @@ def main():
     params = [p for p in net.parameters() if p.requires_grad]
     optimizer = optim.Adam(params, lr=0.0001)
 
-    epochs = 50
+    epochs = 20
     best_acc = 0.0
     save_path = './resNet34.pth'
     train_steps = len(train_loader)

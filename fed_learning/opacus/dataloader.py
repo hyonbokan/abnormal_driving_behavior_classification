@@ -7,7 +7,7 @@ import os
 train_path = '/home/dnlab/Data-B/data/main_data/train_cat_new'
 val_path = '/home/dnlab/Data-B/data/main_data/val_cat_new'
 
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 NUM_CLIENTS = 2
 nw = min([os.cpu_count(), BATCH_SIZE if BATCH_SIZE > 1 else 0, 8])
 
