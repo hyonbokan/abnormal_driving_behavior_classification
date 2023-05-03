@@ -24,7 +24,7 @@ def main():
                                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
 
 
-    train_dataset = datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/train_new",
+    train_dataset = datasets.ImageFolder(root="/home/dnlab/Data-B/data/main_data/train_cat_new",
                                          transform=data_transform["train"])
     train_num = len(train_dataset)
 
@@ -56,83 +56,43 @@ def main():
     net = resnet34(num_classes=7)
     net.to(device)
 
-    # define loss function
-    loss_function = nn.CrossEntropyLoss()
-
-    # construct an optimizer
-    params = [p for p in net.parameters() if p.requires_grad]
-    optimizer = optim.Adam(params, lr=0.0001)
-
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.0001)
     epochs = 20
-    best_acc = 0.0
     save_path = './resNet34.pth'
-    train_losses = []
-    train_accuracies = []
-    val_losses = []
-    val_accuracies = []
+    loss_val = []
+    acc_val = []
 
     for epoch in range(epochs):
-        # train
         net.train()
-        running_loss = 0.0
-        running_corrects = 0.0
-        train_bar = tqdm(train_loader, file=sys.stdout)
-        for step, data in enumerate(train_bar):
-            images, labels = data
-            optimizer.zero_grad()
-            logits = net(images.to(device))
-            loss = loss_function(logits, labels.to(device))
-            loss.backward()
-            optimizer.step()
-
-            # calculate statistics
-            running_loss += loss.item()
-            _, preds = torch.max(logits, 1)
-            running_corrects += torch.sum(preds == labels.to(device))
-
-            train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1,
-                                                                    epochs,
-                                                                    loss)
-
-        # calculate train accuracy
-        train_acc = running_corrects.double() / train_num
-        train_losses.append(running_loss / len(train_loader))
-        train_accuracies.append(train_acc.item())
+        # train
+        for images, labels in tqdm(train_loader):
+                optimizer.zero_grad()
+                criterion(net(images.to(device)), labels.to(device)).backward()
+                optimizer.step()
 
         # validate
         net.eval()
-        acc = 0.0  # accumulate accurate number / epoch
-        val_loss = 0.0
-        val_corrects = 0.0
+        correct, loss = 0, 0.0
         with torch.no_grad():
-            val_bar = tqdm(validate_loader, file=sys.stdout)
-            for val_data in val_bar:
-                val_images, val_labels = val_data
-                outputs = net(val_images.to(device))
-                loss = loss_function(outputs, val_labels.to(device))
-                predict_y = torch.max(outputs, dim=1)[1]
-                acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
-                val_loss += loss.item()
-                _, preds = torch.max(outputs, 1)
-                val_corrects += torch.sum(preds == val_labels.to(device))
+            for images, labels in tqdm(validate_loader):
+                outputs = net(images.to(device))
+                labels = labels.to(device)
+                loss += criterion(outputs, labels).item()
+                correct += (torch.max(outputs.data, 1)[1] == labels).sum().item()
 
-        val_acc = val_corrects / val_num
-        val_loss /= len(validate_loader)
-        val_losses.append(val_loss)
-        val_accuracies.append(val_acc)
+        accuracy = correct / len(validate_loader.dataset)
+        loss /= len(validate_loader)
+        loss_val.append(loss)
+        acc_val.append(accuracy)
 
-        print('[epoch %d] train_loss: %.3f train_acc: %.3f val_loss: %.3f val_accuracy: %.3f' %
-            (epoch + 1, train_losses[-1], train_accuracies[-1], val_losses[-1], val_accuracies[-1]))
+        print('[epoch %d] val_loss: %.3f val_accuracy: %.3f' %
+            (epoch + 1, loss ,accuracy))
 
-        if val_acc > best_acc:
-            best_acc = val_acc
-            # torch.save(net.state_dict(), save_path)
 
     print('Finished Training')
-    print(f"Train loss: {train_losses}")
-    print(f"Train_acc: {train_accuracies}")
-    print(f"Val loss: {val_losses}")
-    print(f"Val_acc: {val_accuracies} ")
+    print(f"Val loss: {loss_val}")
+    print(f"Val_acc: {acc_val} ")
 
 
 if __name__ == '__main__':
