@@ -19,5 +19,4 @@ for subdir, dirs, files in os.walk(root_directory):
                 os.remove(os.path.join(subdir, filename))
                 print(f"Deleted truncated file: {os.path.join(subdir, filename)}")
 
-#-----------------------------------------------------------------------------------------
 

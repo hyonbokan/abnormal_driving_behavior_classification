@@ -4,9 +4,9 @@ import shutil
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-input_dir = '/media/Data-B/data/main_data/train_cat_new/rubbing_eyes'
-train_dir = '/media/Data-B/data/main_data/train_cat_new/rubbing_eyes_train'
-val_dir = '/media/Data-B/data/main_data/val_cat_new/rubbing_eyes'
+input_dir = '/media/Data-B/data/main_data/selected/yawning_all'
+train_dir = '/media/Data-B/data/main_data/train_new/yawning'
+val_dir = '/media/Data-B/data/main_data/val_new/yawning'
 
 if not os.path.exists(train_dir):
     os.makedirs(train_dir)
@@ -22,7 +22,7 @@ for root, dirs, files in os.walk(input_dir):
             image_paths.append(img_path)
 
 # split the list of image paths into train and val sets
-train_paths, val_paths = train_test_split(image_paths, test_size=0.1)
+train_paths, val_paths = train_test_split(image_paths, test_size=0.2)
 
 # copy the train images to output_train_dir
 for img_path in train_paths:

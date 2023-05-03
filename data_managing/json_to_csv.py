@@ -3,26 +3,6 @@ import shutil
 import json
 import csv
 from tqdm import tqdm
-# # specify the source directory containing the JSON files
-# src_dir = '/home/dnlab/Data-B/abnormal_drivers_sample/Annotation'
-
-# # specify the destination directory to copy the JSON files
-# dst_dir = '/home/dnlab/Data-B/abnormal_drivers_sample/all_json'
-
-# # walk through the source directory and its subdirectories
-# for dirpath, dirnames, filenames in os.walk(src_dir):
-#     # iterate over the filenames in each directory
-#     for filename in filenames:
-#         # check if the file has ".json" extension
-#         if filename.endswith('.json'):
-#             # construct the source and destination file paths
-#             src_file = os.path.join(dirpath, filename)
-#             dst_file = os.path.join(dst_dir, filename)
-#             # copy the file from source to destination
-#             shutil.copy(src_file, dst_file)
-
-
-
 
 # specify the input directory containing the JSON files
 input_dir = '/media/Data-B/org_data_abnormal_driving/2.Validation/라벨링데이터/abnormal_230303_add'
