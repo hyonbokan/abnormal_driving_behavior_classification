@@ -95,7 +95,7 @@ def main():
                                                                     loss)
 
         # calculate train accuracy
-        train_acc = running_corrects.double() / len(train_num)
+        train_acc = running_corrects.double() / train_num
         train_losses.append(running_loss / len(train_loader))
         train_accuracies.append(train_acc.item())
 
