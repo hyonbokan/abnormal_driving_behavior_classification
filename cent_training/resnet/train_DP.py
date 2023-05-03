@@ -88,7 +88,7 @@ def main():
     target_epsilon=EPSILON,
     target_delta=DELTA,
     max_grad_norm=MAX_GRAD_NORM,
-)
+    )
 
 
     for epoch in range(epochs):
