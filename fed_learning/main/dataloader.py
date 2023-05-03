@@ -66,4 +66,5 @@ def load_datasets(train_dir, val_dir, num_clients):
 
 train_loader, val_loader = load_datasets(train_dir=train_path, val_dir=val_path, num_clients=NUM_CLIENTS)
 
-len(val_loader[0])
+print(len(val_loader[0]))
+print(len(val_loader[0].dataset))

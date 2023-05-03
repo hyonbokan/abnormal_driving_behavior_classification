@@ -35,7 +35,7 @@ def main():
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
 
-    batch_size = 16
+    batch_size = 32
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
     print('Using {} dataloader workers every process'.format(nw))
 
@@ -52,12 +52,8 @@ def main():
 
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
-    
-    # net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2])
+
     net = resnet34(num_classes=7)
-    # change fc layer structure
-    # in_channel = net.fc.in_features
-    # net.fc = nn.Linear(in_channel, 5) # it could be the number of classes
     net.to(device)
 
     # define loss function
@@ -70,7 +66,6 @@ def main():
     epochs = 20
     best_acc = 0.0
     save_path = './resNet34.pth'
-    train_steps = len(train_loader)
     train_losses = []
     train_accuracies = []
     val_losses = []
@@ -100,8 +95,8 @@ def main():
                                                                     loss)
 
         # calculate train accuracy
-        train_acc = running_corrects.double() / len(train_loader.dataset)
-        train_losses.append(running_loss / train_steps)
+        train_acc = running_corrects.double() / len(train_num)
+        train_losses.append(running_loss / len(train_loader))
         train_accuracies.append(train_acc.item())
 
         # validate
@@ -121,13 +116,13 @@ def main():
                 _, preds = torch.max(outputs, 1)
                 val_corrects += torch.sum(preds == val_labels.to(device))
 
-        val_acc = acc / val_num
+        val_acc = val_corrects / val_num
         val_loss /= len(validate_loader)
         val_losses.append(val_loss)
         val_accuracies.append(val_acc)
 
         print('[epoch %d] train_loss: %.3f train_acc: %.3f val_loss: %.3f val_accuracy: %.3f' %
-            (epoch + 1, train_losses[-1], train_accuracies[-1], val_loss, val_acc))
+            (epoch + 1, train_losses[-1], train_accuracies[-1], val_losses[-1], val_accuracies[-1]))
 
         if val_acc > best_acc:
             best_acc = val_acc
