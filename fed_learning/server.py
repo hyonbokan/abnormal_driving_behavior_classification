@@ -19,7 +19,7 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 strategy = fl.server.strategy.FedAvg(
     fraction_fit=1.0,  # Sample 100% of available clients for training
     fraction_evaluate=1.0,  # Sample 100% of available clients for evaluation
-    min_fit_clients=2,  #  Sample 3 clients for training
+    min_fit_clients=2,  #  Sample 2 clients for training
     min_evaluate_clients=2,
     min_available_clients=2,
     evaluate_metrics_aggregation_fn=weighted_average
