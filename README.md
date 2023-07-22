@@ -33,4 +33,4 @@ Please note that the implementations in this repository are for educational and 
 
 Feel free to explore the repository and use the code as a reference for your own projects or research. We hope this repository serves as a valuable resource for learning and understanding the concepts of centralized and federated learning in the context of abnormal driving detection. If you have any questions or suggestions, please feel free to reach out and contribute to the repository.
 
-![Cetralized vs Federated Learning Accuracy](saved_plots/cl_vs_fl_acc.png)
+![Cetralized vs Federated Learning Accuracy](plots/saved_plots/cl_vs_fl_acc.png)
