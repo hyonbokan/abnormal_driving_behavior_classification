@@ -14,10 +14,6 @@ The repository is organized into the following main directories:
 
 4. `plots`: The `plots` directory contains Jupyter Notebook files (`.ipynb`) with plots and visualizations. These visualizations compare the accuracy and loss of centralized learning and federated learning. Additionally, it includes comparisons of results using the Mobilenet architecture as well as different iterations of training, such as reducing the number of classes, changing batch sizes, and the number of training rounds.
 
-## Dataset Source
-
-All the data used in this project was obtained from AI Hub, a valuable resource for various AI-related datasets. The specific dataset used for abnormal driving can be found at the following link: [Abnormal Driving Dataset](https://aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=651). The dataset provides important insights for the abnormal driving detection task and forms the foundation for this project's experiments.
-
 ## Credits
 
 ### Dataset Source
