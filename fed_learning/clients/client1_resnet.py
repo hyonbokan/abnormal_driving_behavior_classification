@@ -1,14 +1,8 @@
 from collections import OrderedDict
 from typing import List, Tuple
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
 import flwr as fl
 from flwr.common import Metrics
 from resnet import ResNet, BasicBlock, resnet34
-# from split_data import train_sets, val_sets
 from dataloader import train_loader, val_loader
 from tqdm import tqdm
 
@@ -16,9 +10,6 @@ DEVICE = torch.device("cuda")  # Try "cuda" to train on GPU
 print(
     f"Training on {DEVICE} using PyTorch {torch.__version__} and Flower {fl.__version__}"
 )
-
-
-
 
 def train(net, trainloader, epochs: int, verbose=False):
     """Train the network on the training set."""
@@ -48,10 +39,7 @@ def test(net, testloader):
     return loss, accuracy
 
 
-net = resnet34(num_classes=5).to(DEVICE)
-# net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(DEVICE)
-# in_channel = net.fc.in_features
-# net.fc = nn.Linear(in_channel, 5)
+net = resnet34(num_classes=7).to(DEVICE)
 trainloader = train_loader[1]
 testloader = val_loader[1]
 

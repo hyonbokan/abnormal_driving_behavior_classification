@@ -3,7 +3,6 @@ from torch.utils.data import random_split, DataLoader
 from torchvision import datasets, transforms
 import os
 
-
 train_path = '/home/dnlab/Data-B/data/main_data/train_new'
 val_path = '/home/dnlab/Data-B/data/main_data/val_new'
 

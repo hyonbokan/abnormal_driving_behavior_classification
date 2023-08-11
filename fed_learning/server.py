@@ -1,5 +1,4 @@
 from typing import List, Tuple
-
 import flwr as fl
 from flwr.common import Metrics
 

@@ -1,14 +1,8 @@
 from collections import OrderedDict
 from typing import List, Tuple
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
 import flwr as fl
 from flwr.common import Metrics
 from resnet import ResNet, BasicBlock, resnet34
-# from split_data import train_sets, val_sets
 from dataloader import train_loader, val_loader
 from tqdm import tqdm
 
@@ -17,6 +11,9 @@ print(
     f"Training on {DEVICE} using PyTorch {torch.__version__} and Flower {fl.__version__}"
 )
 
+net = resnet34(num_classes=7).to(DEVICE)
+trainloader = train_loader[0]
+testloader = val_loader[0]
 
 
 
@@ -24,6 +21,7 @@ def train(net, trainloader, epochs: int, verbose=False):
     """Train the network on the training set."""
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=0.0001)
+    # Add DP code here
     net.train()
     for epoch in range(epochs):
         # train
@@ -47,13 +45,6 @@ def test(net, testloader):
     accuracy = correct / len(testloader.dataset)
     return loss, accuracy
 
-
-net = resnet34(num_classes=5).to(DEVICE)
-# net = ResNet(block=BasicBlock, num_classes=5, blocks_num=[2,2,2,2]).to(DEVICE)
-# in_channel = net.fc.in_features
-# net.fc = nn.Linear(in_channel, 5)
-trainloader = train_loader[0]
-testloader = val_loader[0]
 
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
